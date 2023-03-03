@@ -10,15 +10,30 @@ config.read('config.ini')
 openai.api_key = config.get('openai', 'api_key')
 
 # API 연결 테스트
-model_engine = "text-davinci-002"  # 사용할 모델 엔진 설정
-prompt = "what thois it mean that 38 prompt + 79 completion = 117 tokens?"  # 사용할 프롬프트 설정
+model_engine = "code-davinci-002"  # 사용할 모델 엔진 설정 (text-davinci-002)
+strSchema = "### Postgres SQL tables, with their properties:\n#\n# Employee(id, name, department_id)\n# Department(id, name, address)\n# Salary_Payments(id, employee_id, amount, date)\n#\n### "  # 사용할 프롬프트 설정
+strQueryMode = "\nSELECT"
 
+strPrompt = "지난 3개월동안 10명 이상의 직원을 고용한 부서의 이름을 나열해줘"
 try:
     response = openai.Completion.create(
-        engine=model_engine,
-        prompt=prompt,
-        max_tokens=50
+        model=model_engine, 
+        prompt=strSchema+strPrompt+strQueryMode,
+        temperature=0,
+        max_tokens=150,
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=0.0,
+        stop=["#", ";"]
     )
+    # response = openai.Completion.create(
+    #     engine=model_engine, # 사용할 모델 엔진 설정
+    #     prompt=prompt, # 사용할 프롬프트 설정
+    #     max_tokens=200 # 생성할 토큰의 최대 개수 설정
+    # )
+    
+    # api 호출하는 부분
+    
 
     print(response["choices"][0]["text"])
 except openai.error.APIError as e:
